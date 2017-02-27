@@ -14,6 +14,7 @@
 			}
 			Observer.prototype = {
 				//递归遍历传入对象的各个属性
+				constructor:Observer,
 				walk: function(obj) {
 					var value;
 					for(var key in obj) {
