@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<script>
+			function Observer(data) {
+				this.data = data;
+				this.walk(data);
+			}
+			Observer.prototype = {
+				//递归遍历传入对象的各个属性
+				walk: function(obj) {
+					var value;
+					for(var key in obj) {
+						//过滤原型链上的属性
+						if(obj.hasOwnProperty(key)) {
+							value = obj[key];
+							//是对象就说明还需要接着遍历
+							if(typeof value === "object") {
+								new Observer(value);
+							}
+							this.bind(key, value);
+
+						}
+					}
+				},
+				bind: function(key, value) {
+					Object.defineProperty(this.data, key, {
+						//能否通过for-in 遍历
+						enumerable: true,
+						configurable: true,
+						get: function() {
+							console.log('你访问了' + key);
+							return value
+						},
+						set: function(newVal) {
+							console.log('你设置了' + key);
+							console.log('新的' + key + ' = ' + newVal)
+							if(newVal === value) return;
+							//更改vlue的值
+							value = newVal
+						}
+					})
+				}
+			}
+			var data = {
+				user: {
+					name: "李凯旋",
+					age: 18,
+					info: {
+						a: "我是a"
+					}
+				},
+				test: {
+					t: "阿斯达"
+				}
+			}
+			new Observer(data);
+		</script>
+	</body>
+
+</html>
