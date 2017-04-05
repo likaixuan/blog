@@ -4,7 +4,9 @@
 let http = require('http');
 let fs = require('fs');
 let path = require('path');
-let minme = require('mime');
+let mime = require('mime');
+let chatServer = require('./lib/chat_server');
+
 let cache = {};
 
 let server = http.createServer(function (req,res) {
@@ -17,6 +19,9 @@ let server = http.createServer(function (req,res) {
 	var absPath = './' + filePath;
 	serverStatic(res,cache,absPath);
 });
+chatServer.listen(server);
+// 监听来自页面的
+请求
 server.listen(3000,function() {
 	console.log("server listening on port 3000");
 })
@@ -34,7 +39,7 @@ function send404 (res) {
 function sendFile (res,filePath,fileContents) {
 	res.writeHead(
 		200,{
-			'Content-Type':minme.lookup(path.basename(filePath))
+			'Content-Type':mime.lookup(path.basename(filePath))
 		}
 	);
 	res.end(fileContents);

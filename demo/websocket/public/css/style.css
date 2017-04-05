@@ -18,8 +18,7 @@ a {
 	margin-bottom:1em;
 }
 
-#message {
-	background:red;
+#messages {
 	width:690px;
 	height:300px;
 	overflow:auto;
