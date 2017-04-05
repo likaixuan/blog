@@ -1,13 +1,13 @@
-##参考- 
-《javascript高级程序设计》
-《javascript权威指南》
-   MDN
+## 参考- 
+《javascript高级程序设计》<br/>
+《javascript权威指南》<br/>
+ MDN <br/>
 
-####1 ES5 数组方法
+#### 1 ES5 数组方法
 
 >  大多数ES5数组方法第一个参数是一个函数，第二个参数是可选的，如果有第二个参数则第一个参数被看做是第二个参数的方法，也是说调用函数时传递进去的第二个参数作为它的this关键值（如果传this的话，需要注意一下箭头函数绑定作用域的问题）
 
-######1. Array.prototype.forEach方法
+###### 1. Array.prototype.forEach方法
 ```javascript
 var a = ['A', 'B', 'C'];
 a.forEach(function (element, index, array) { 
@@ -123,7 +123,7 @@ Array.isArray(true);
 Array.isArray(false);
 Array.isArray({ __proto__: Array.prototype });
 ```
-####2 ES5对象
+#### 2 ES5对象
 
 
 ###### 1.Object.keys
