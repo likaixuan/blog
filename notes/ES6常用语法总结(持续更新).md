@@ -1,6 +1,6 @@
 ## 参考- 
-《ECMAScript 6入门》- 阮一峰
-《全栈javascript教程》- 廖雪峰
+《ECMAScript 6入门》- 阮一峰<br/>
+《全栈javascript教程》- 廖雪峰<br/>
 《实战ES2015》- 小问
 #### let  const
 >具有块级作用域 且不存在变量提升 只能先声明后使用 而且不能重复声明
