@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>Document</title>
+		<style>
+			@charset "utf-8";
+			body,
+			ul {
+				padding: 0px;
+				margin: 0px;
+			}
+			/*地图*/
+			
+			#map {
+				position: relative;
+				width: 1400px;
+				height: 600px;
+				background: url(1.jpg);
+			}
+			/*路*/
+			
+			#road {
+				position: absolute;
+				z-index: 2;
+				left: 250px;
+				top: 200px;
+				background: url(8.png);
+				width: 755px;
+				height: 110px;
+				z-index: 10;
+			}
+			
+			#road img {
+				position: absolute;
+				width: 50px;
+				height: 50px;
+				top: 0px;
+				bottom: 0px;
+				margin: auto 0px;
+			}
+			/*道具栏*/
+			
+			#props {
+				position: absolute;
+				bottom: 0px;
+				left: 100px;
+				z-index: 1000;
+				background: gainsboro;
+				list-style: none;
+				text-align: center;
+			}
+			
+			#props li {
+				position: relative;
+				display: inline-block;
+				height: 50px;
+				width: 50px;
+			}
+			
+			#props li span {
+				position: absolute;
+				padding: 2px;
+				right: 2px;
+				top: 2px;
+				border-radius: 100%;
+				background: gold;
+			}
+			
+			#props li img {
+				border: 2px solid gray;
+				height: 100%;
+				width: 100%;
+				cursor: pointer;
+			}
+			
+			#props li img.action {
+				border: 3px solid green;
+			}
+			/*星星数量*/
+			
+			#star-number {
+				position: absolute;
+				z-index: 1000;
+				height: 50px;
+				width: 50px;
+				border-radius: 50px;
+				text-align: center;
+				line-height: 50px;
+				background: gold;
+				color: white;
+				font-weight: 900;
+				font-size: 20px;
+			}
+			/*降落星星*/
+			
+			.star {
+				position: absolute;
+				width: 50px;
+				height: 50px;
+				z-index: 1000;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="map">
+			<div id="road"></div>
+			<ul id="props">
+				<li><img src="4.gif" data-star=25 class="plant" /><span>25</span></li>
+				<li><img src="Wallnut_body.png" data-star=50 class="plant" /><span>50</span></li>
+			</ul>
+			<div id="star-number">25</div>
+		</div>
+		<script type="text/javascript">
+			/* star 星星数
+			 * starTimer  星星降落时间
+			 * map 地图
+			 * road 路
+			 * starNumber 展示分数的标签
+			 * props 道具栏
+			 * plant 当前要种的植物 图片
+			 * plantArr 全体植物
+			 */
+			var star = 25,
+				starTimer = 3000,
+				map = document.getElementById("map"),
+				road = document.getElementById("road"),
+				starNumber = document.getElementById("star-number"),
+				props = document.getElementById("props"),
+				plant = null,
+				plantArr;
+
+			/*降落星星*/
+			setInterval(function() {
+				//创建一个img标签
+				var img = document.createElement("img");
+				//给img标签赋值上我们写的star class
+				img.className = "star";
+				//将图片地址赋值给src
+				img.src = "star.gif"
+					//当点击时给star
+				img.onclick = function() {
+						setStar(10);
+						//谁被点击 this就是谁 parentNode 就是 this的 父节点
+						this.parentNode.removeChild(this);
+					}
+					//将img添加到 地图里 
+				map.appendChild(img);
+				//随机生成img的水平位置 而且不能超出地图
+				img.style.left = Math.random() * (map.offsetWidth - img.offsetWidth) + 'px';
+				setInterval(function() {
+					img.style.top = img.offsetTop + 5 + "px";
+					//碰到地图边界 删除img
+					if(img.offsetTop >= map.offsetHeight - img.offsetHeight) {
+						map.removeChild(img);
+					}
+				}, 100);
+
+			}, starTimer);
+
+			//鼠标在道具栏上点击时 用于选择道具
+			props.onclick = function(event) {
+				//利用事件冒泡机制 给元素绑定单击事件
+				if(event.target.tagName === "IMG" && event.target.className === "plant") {
+					if(event.target.dataset.star <= star) {
+						clearStyle();
+						event.target.className = "action plant";
+						plant = event.target.cloneNode();
+					}
+
+				}
+			}
+
+			// 点击路的时候
+			road.onclick = function(event) {
+				//在此区间
+				if(event.offsetX > 25 && event.offsetX + 50 < this.offsetWidth) {
+					if(!!plant && event.target.className !== "action plant") {
+						plant.style.left = event.offsetX - 25 + 'px';
+						setStar(-plant.dataset.star);
+						this.appendChild(plant);
+						clearStyle();
+						plant = null;
+					}
+
+				}
+			}
+
+			function clearStyle() {
+				var t = props.getElementsByTagName("img");
+				for(var i = 0; i < t.length; i++) {
+					t[i].className = "plant";
+				}
+			}
+
+			function setStar(n) {
+				star += n;
+				starNumber.innerText = star;
+			}
+		</script>
+	</body>
+
+</html>
