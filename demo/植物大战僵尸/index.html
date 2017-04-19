@@ -31,14 +31,38 @@
 				height: 110px;
 				z-index: 10;
 			}
+			/*植物*/
 			
-			#road img {
+			#road .plant {
 				position: absolute;
 				width: 50px;
 				height: 50px;
 				top: 0px;
 				bottom: 0px;
 				margin: auto 0px;
+			}
+			/*僵尸*/
+			
+			#road .createZombies {
+				position: absolute;
+				height: 128px;
+				width: 66px;
+				top: 0px;
+				bottom: 0px;
+				right: 0px;
+				margin: auto 0px;
+				z-index: 1000;
+			}
+			/*子弹*/
+			
+			#road .bullet {
+				position: absolute;
+				width: 35px;
+				height: 35px;
+				top: 0px;
+				bottom: 0px;
+				margin: auto 0px;
+				z-index: 1001;
 			}
 			/*道具栏*/
 			
@@ -108,12 +132,21 @@
 		<div id="map">
 			<div id="road"></div>
 			<ul id="props">
-				<li><img src="4.gif" data-star=25 class="plant" /><span>25</span></li>
-				<li><img src="Wallnut_body.png" data-star=50 class="plant" /><span>50</span></li>
+				<li><img src="4.gif" data-star=25 data-hps=50 data-hp=50 data-defense=20 data-damage=10 data-speed=2 class="plant" /><span>25</span></li>
+				<li><img src="Wallnut_body.png" data-star=50 data-defense=90 data-hps=100 data-hp=100 data-damage=0 data-speed=0 class="plant" /><span>50</span></li>
 			</ul>
 			<div id="star-number">25</div>
 		</div>
 		<script type="text/javascript">
+			/*
+			 * data-star 所需star数
+			 * data-hp hp 当前血量
+			 * data-HP 总血量
+			 * data-defense 防御力
+			 * data-damage 攻击力
+			 * data-speed 攻速
+			 */
+
 			/* star 星星数
 			 * starTimer  星星降落时间
 			 * map 地图
@@ -122,6 +155,8 @@
 			 * props 道具栏
 			 * plant 当前要种的植物 图片
 			 * plantArr 全体植物
+			 * bullet 发射的子弹
+			 * zombies 僵尸数组
 			 */
 			var star = 25,
 				starTimer = 3000,
@@ -130,9 +165,97 @@
 				starNumber = document.getElementById("star-number"),
 				props = document.getElementById("props"),
 				plant = null,
-				plantArr;
+				plantArr = [],
+				bullet = [],
+				zombiesArr = [];
 
-			/*降落星星*/
+			//选择道具
+			props.onclick = function(event) {
+				//利用事件冒泡机制 给元素绑定单击事件
+				if(event.target.tagName === "IMG" && event.target.className === "plant") {
+					if(event.target.dataset.star <= star) {
+						clearStyle();
+						event.target.className = "action plant";
+						plant = event.target.cloneNode();
+					}
+
+				}
+			}
+
+			//放置植物
+			road.onclick = function(event) {
+				//植物可摆放的区间
+				if(event.offsetX > 25 && event.offsetX + 50 < this.offsetWidth) {
+					if(!!plant && event.target.className !== "action plant") {
+						plant.style.left = event.offsetX - 25 + 'px';
+						//购买植物减去相应star
+						setStar(-plant.dataset.star);
+						//放置植物
+						this.appendChild(plant);
+						//植物数组
+						plantArr.push(plant);
+						//战斗力为零 不发射子弹
+						if(parseInt(plant.dataset.damage) !== 0) {
+							//创建子弹
+							bullet.push(createBullet(plant.dataset.speed, plant.dataset.damage, event.offsetX + 25));
+						}
+						//清除道具选中样式
+						clearStyle();
+						//清除选中道具
+						plant = null;
+					}
+
+				}
+			}
+
+			//清除道具选中样式
+			function clearStyle() {
+
+				var t = props.getElementsByTagName("img");
+				for(var i = 0; i < t.length; i++) {
+					t[i].className = "plant";
+				}
+			}
+
+			//设置星星数 减去传负数、加则传正数
+			function setStar(n) {
+				star += n;
+				starNumber.innerText = star;
+			}
+
+			// 生成僵尸
+			function createZombies(damage, defense, hp, speed) {
+				var img = document.createElement("img");
+				img.className = 'createZombies';
+				img.src = '8.gif';
+				img.dataset.damage = damage;
+				img.dataset.defense = defense;
+				img.dataset.speed = speed;
+				img.dataset.HP = hp;
+				img.dataset.hp = hp;
+				img.dataset.speed = speed;
+				road.appendChild(img);
+				return img;
+			}
+
+			// 生成子弹
+			function createBullet(speed, damage, left) {
+				/*
+				 * speed 射速
+				 * damage 伤害
+				 */
+				var img = document.createElement("img");
+				img.className = 'bullet';
+				//设置到创建的子弹标签上
+				img.dataset.speed = speed;
+				img.dataset.damage = damage;
+				img.style.left = left + 'px';
+				img.src = '6.gif';
+				road.appendChild(img);
+				return img;
+			}
+
+			//降落星星
 			setInterval(function() {
 				//创建一个img标签
 				var img = document.createElement("img");
@@ -160,45 +283,132 @@
 
 			}, starTimer);
 
-			//鼠标在道具栏上点击时 用于选择道具
-			props.onclick = function(event) {
-				//利用事件冒泡机制 给元素绑定单击事件
-				if(event.target.tagName === "IMG" && event.target.className === "plant") {
-					if(event.target.dataset.star <= star) {
-						clearStyle();
-						event.target.className = "action plant";
-						plant = event.target.cloneNode();
+			// 间隔一段时间 生成一波子弹
+			setInterval(function() {
+				for(var i = 0; i < plantArr.length; i++) {
+					//战斗力不为0
+					if(parseInt(plantArr[i].dataset.damage) !== 0) {
+						//创建子弹
+						bullet.push(createBullet(plantArr[i].dataset.speed, plantArr[i].dataset.damage, plantArr[i].offsetLeft + 25));
+					}
+				}
+			}, 9000);
+			// 让子弹飞
+			setInterval(function() {
+				for(var i = 0; i < bullet.length; i++) {
+					bullet[i].style.left = bullet[i].offsetLeft + parseInt(bullet[i].dataset.speed) + "px";
+					for(var j = 0; j < zombiesArr.length; j++) {
+						//打到僵尸身上了 -30的原因是 图片有空白
+						if(bullet[i].offsetLeft + bullet[i].offsetWidth - 30 >= zombiesArr[j].offsetLeft) {
+							/*
+							 * data-star 所需star数
+							 * data-hp hp
+							 * data-defense 防御力
+							 * data-damage 攻击力
+							 * data-speed 攻速
+							 */
+							if(bullet[i].offsetLeft - zombiesArr[j].offsetLeft - zombiesArr[j].offsetWidth < 5) {
+								//计算伤害
+								calcDamage(zombiesArr[j], bullet[i], '11.gif');
+								//受伤状态
+								zombiesState(j, zombiesArr[j], zombiesArr);
+								//从地图中删除
+								road.removeChild(bullet[i]);
+								//从数组中删除
+								bullet.splice(i, 1);
+								break;
+							}
+							//打到地图外 删除子弹
+							if(bullet[i].offsetLeft + bullet[i].offsetWidth > road.offsetWidth) {
+								bullet[i].parentNode.removeChild(bullet[i]);
+								//从数组中删除
+								bullet.splice(i, 1);
+							}
+
+						}
+					}
+				}
+			}, 20);
+			// 僵尸走路
+			setInterval(function() {
+				for(var i = 0; i < zombiesArr.length; i++) {
+					zombiesArr[i].style.left = zombiesArr[i].offsetLeft - parseInt(zombiesArr[i].dataset.speed) + "px";
+					if(zombiesArr[i].offsetLeft + zombiesArr[i].offsetWidth < 0) {
+						alert("你被僵尸吃掉了脑子");
+						location.reload();
+					}
+					for(var j = 0; j < plantArr.length; j++) {
+						//僵尸和植物碰上了 
+						if(zombiesArr[i].offsetLeft <= plantArr[j].offsetLeft + plantArr[j].offsetWidth) {
+							/*
+							 * data-star 所需star数
+							 * data-hp hp
+							 * data-defense 防御力
+							 * data-damage 攻击力
+							 * data-speed 攻速
+							 */
+							//植物在僵尸之后时 不卡主僵尸
+							if(plantArr[j].offsetLeft + plantArr[j].offsetWidth - zombiesArr[i].offsetLeft < 5) {
+								//让僵尸止步
+								zombiesArr[i].style.left = zombiesArr[i].offsetLeft + parseInt(zombiesArr[i].dataset.speed) + "px";
+								calcDamage(plantArr[j], zombiesArr[i]);
+								plantState(j, plantArr[j], plantArr);
+								break;
+							}
+
+						}
+
+					}
+				}
+			}, 60);
+			//计算真实伤害
+			function calcDamage(keep, attack) {
+				/*
+				 * kepp 被攻击方
+				 * attack 攻击方
+				 */
+				//计算减免的伤害值 百分比*伤害
+				var breaks = keep.dataset.defense / 100 * attack.dataset.damage;
+				//减血
+				keep.dataset.hp = keep.dataset.hp - (attack.dataset.damage - breaks);
+
+			}
+			//植物状态
+			function plantState(index, plant, plantArr) {
+				//受伤啦 上绷带
+				console.log(plant.dataset.hps);
+				if(plant.dataset.hps * 0.5 > 　parseInt(plant.dataset.hp)) {
+					if(parseInt(plant.dataset.damage) !== 0) {
+						plant.src = '5.png';
+					} else {
+						plant.src = 'Wallnut_cracked2.png';
 					}
 
-				}
-			}
-
-			// 点击路的时候
-			road.onclick = function(event) {
-				//在此区间
-				if(event.offsetX > 25 && event.offsetX + 50 < this.offsetWidth) {
-					if(!!plant && event.target.className !== "action plant") {
-						plant.style.left = event.offsetX - 25 + 'px';
-						setStar(-plant.dataset.star);
-						this.appendChild(plant);
-						clearStyle();
-						plant = null;
+					if(parseInt(plant.dataset.hp) <= 0) {
+						//从植物数组中删除植物
+						plantArr.splice(index, 1);
+						//从地图中删除植物
+						plant.parentNode.removeChild(plant);
 					}
-
 				}
 			}
-
-			function clearStyle() {
-				var t = props.getElementsByTagName("img");
-				for(var i = 0; i < t.length; i++) {
-					t[i].className = "plant";
+			//僵尸状态
+			function zombiesState(index, zombies, zombiesArr) {
+				//受伤啦 上绷带
+				console.log(parseInt(zombies.dataset.hp));
+				if(zombies.dataset.HP * 0.5 > 　parseInt(zombies.dataset.hp)) {
+					zombies.src = '11.gif';
+					if(parseInt(zombies.dataset.hp) <= 0) {
+						//从植物数组中删除植物
+						zombiesArr.splice(index, 1);
+						//从地图中删除植物
+						zombies.parentNode.removeChild(zombies);
+					}
 				}
 			}
-
-			function setStar(n) {
-				star += n;
-				starNumber.innerText = star;
-			}
+			setInterval(function() {
+				zombiesArr.push(createZombies(20, 5, 30, 1));
+			}, 10000);
 		</script>
 	</body>
 
