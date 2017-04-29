@@ -169,9 +169,9 @@
 				bullet = [],
 				zombiesArr = [];
 
-			//选择道具
-			props.onclick = function(event) {
-				//利用事件冒泡机制 给元素绑定单击事件
+			//事件委托
+			map.onclick = function(event) {
+				//选择道具
 				if(event.target.tagName === "IMG" && event.target.className === "plant") {
 					if(event.target.dataset.star <= star) {
 						clearStyle();
@@ -180,6 +180,14 @@
 					}
 
 				}
+				//当点击时给star
+				if(event.target.tagName === "IMG" && event.target.className === "star") {
+					setStar(10);
+					//谁被点击 this就是谁 parentNode 就是 this的 父节点
+					event.target.parentNode.removeChild(event.target);
+
+				}
+
 			}
 
 			//放置植物
@@ -263,13 +271,7 @@
 				img.className = "star";
 				//将图片地址赋值给src
 				img.src = "star.gif"
-					//当点击时给star
-				img.onclick = function() {
-						setStar(10);
-						//谁被点击 this就是谁 parentNode 就是 this的 父节点
-						this.parentNode.removeChild(this);
-					}
-					//将img添加到 地图里 
+
 				map.appendChild(img);
 				//随机生成img的水平位置 而且不能超出地图
 				img.style.left = Math.random() * (map.offsetWidth - img.offsetWidth) + 'px';
