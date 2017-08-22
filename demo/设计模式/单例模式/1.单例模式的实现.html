@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // 单例模式，是一种常用的软件设计模式。通过单例模式可以保证系统中一个类只有一个实例。即一个类只有一个对象实例
+        // 有各种各样的实现方式  不过就是用一个变量来标识一下这个类有没有创建过对象了 有就直接返回这个对象 否则创建新对象
+
+        //其实在javascript里，我们不需要先创建类，再根据类去创建对象，可以直接创建一个对象，这其实就天然的满足了单例模式的条件（确保只有一个实例，这个实例可供全局访问）
+        
+        //这其实就是一个简单的单例模式（需要解决命名污染情况，可以使用闭包、命名空间来解决）
+        let obj = {};
+    
+        //传统方式去实现（好处就是 可以实现惰性单例，需要时再创建）
+        let Obj = (function () {
+            let instance = null;
+            return function (name) {
+                if (!!instance) {
+                    return instance;
+                }
+                this.name = name;
+                instance = this;
+            }
+        })();
+        let obj1 = new Obj("张三"), obj2 = new Obj("李四");
+        console.log("obj1:", obj1);
+        console.log("obj2:", obj2);
+        console.log("obj1===obj2:", obj1 === obj2);
+    </script>
+</body>
+
+</html>
