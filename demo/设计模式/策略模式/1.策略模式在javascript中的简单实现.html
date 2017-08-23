@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //根据绩效等级和基本工资作为依据来发工资
+
+        //将策略封装起来
+        let strategies = {
+            "a": function (salary) {
+                return salary * 5
+            },
+            "b": function (salary) {
+                return salary * 4
+            },
+            "c": function (salary) {
+                return salary * 3
+            }
+        }
+        let calculateBonus =function (level,salary) {
+            return strategies[level](salary);
+        }
+        console.log(calculateBonus("b",100));
+    </script>
+</body>
+
+</html>

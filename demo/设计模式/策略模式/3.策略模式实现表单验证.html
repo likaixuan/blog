@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <form action="">
+        用户名：<input type="text" name="userName"> 密码：
+        <input type="text" name="password">
+        <button>登陆</button>
+    </form>
+    <script>
+        let strategies = {
+            isNonEmpty: function (value, errorMsg) {
+                //非空验证
+                if (value === '') {
+                    return errorMsg;
+                }
+            },
+            minLength: function (value, length, errorMsg) {
+                if (value.length < length) {
+                    return errorMsg;
+                }
+            },
+            isMobile: function (value) {
+
+            }
+        };
+
+        let Validator = function () {
+            this.cache = [];
+        };
+
+        // 添加验证
+        Validator.prototype.add = function (dom, rules) {
+
+            let self = this;
+            for (var i = 0, rule; rule = rules[i++];) {
+                (function (rule) {
+                    var ary = rule.strategy.split(':');
+                    var errorMsg = rule.errorMsg;
+                    self.cache.push(function () {
+                        console.log(111)
+                        var strategy = ary.shift();
+                        ary.unshift(dom.value);
+                        ary.push(errorMsg);
+                        return strategies[strategy].apply(dom, ary);
+                    })
+                })(rule)
+
+            }
+        }
+
+        //开始验证
+        Validator.prototype.start = function () {
+            for (var i = 0, fun; fun = this.cache[i++];) {
+                var msg = fun();
+                if (msg) {
+                    return msg;
+                }
+            }
+        }
+        let validator = new Validator();
+        let formObj = document.querySelector('form');
+        validator.add(formObj.userName, [ {
+            strategy: 'isNonEmpty',
+            errorMsg: "用户名不能为空"
+        },{
+            strategy: 'minLength:5',
+            errorMsg: "用户名不能小于5位"
+        }]);
+
+        formObj.onsubmit = function () {
+            let msg = validator.start();
+            if (!!msg) {
+                alert(msg);
+                return;
+            }
+        }
+    </script>
+</body>
+
+</html>

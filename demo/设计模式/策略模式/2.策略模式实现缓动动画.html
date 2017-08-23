@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        div {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="div">
+        div
+    </div>
+    <script>
+        //缓动动画策略
+        let tween = {
+            lnear: function (t, b, c, d) {
+                return c * t / d + b;
+            },
+            easeIn: function (t, b, c, d) {
+                return c * (t /= d) * t + b;
+            }
+        };
+        //动画类
+        let Animate = function (dom) {
+            this.dom = dom;
+            this.startTime = 0;
+            this.startPos = 0;
+            this.endPos = 0;
+            this.propertyName = null;
+            this.easing = null;
+            this.duration = null;
+        };
+
+        //开始动
+        Animate.prototype.start = function (propertyName, endPos, duration, easing) {
+            this.startTime = +new Date;
+            this.startPos = this.dom.getBoundingClientRect()[propertyName];
+            this.endPos = endPos;
+            this.propertyName = propertyName;
+            this.easing = tween[easing];
+            this.duration = duration;
+            var self = this;
+            var timeId = setInterval(function () {
+                if (self.step() === false) {
+                    clearInterval(timeId);
+                }
+            }, 19);
+        }
+
+        //每一步
+        Animate.prototype.step = function () {
+            let t = +new Date;
+            if (t > this.startTime + this.duration) {
+                this.update(this.endPos);
+                return false;
+            }
+            let pos = this.easing(t - this.startTime, this.startPos, this.endPos - this.startPos, this.duration);
+            this.update(pos);
+        }
+
+        //更新位置
+        Animate.prototype.update = function (pos) {
+            this.dom.style[this.propertyName] = pos + 'px';
+        }
+
+        let animate = new Animate(document.querySelector("#div"));
+
+        animate.start("top", 500, 1000, 'easeIn');
+    </script>
+</body>
+
+</html>
