@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //网络图片地址
+        let networkSrc = 'http://bbs.hebei.com.cn/data/attachment/forum/201312/02/111412cls9looz9zsc9wst.jpg';
+
+        let ImgObj = (function () {
+            let imgNode = document.createElement('img');
+            document.body.appendChild(imgNode);
+            return function (src) {
+                imgNode.src = src;
+            }
+        })();
+
+        let proxyImg = (function () {
+            let img = new Image;
+            img.onload = function () {
+                ImgObj(this.src);
+            }
+            return function (src) {
+                ImgObj('./loding.gif');
+                img.src = src;
+            }
+        }
+        )();
+        proxyImg(networkSrc);
+    </script>
+</body>
+
+</html>

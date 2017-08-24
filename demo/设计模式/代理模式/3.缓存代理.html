@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //计算乘积
+        let mult = function () {
+            let product = 1;
+            for (let i = 0, item; item = arguments[i++];) {
+                product *= item;
+            }
+            return product;
+        };
+        let plus = function () {
+            let sum = 0;
+            for (let i = 0, item; item = arguments[i++];) {
+                sum += item;
+            }
+            return sum;
+        }
+
+        let proxy = function (fn) {
+            let cache = {};
+            return function () {
+                let args = Array.prototype.join.call(arguments,',');
+                if(args in cache) {
+                    return cache[args];
+                } else {
+                    return cache[args] = fn.apply(this,arguments);
+                }
+            }
+        }
+
+        let proxyMult = proxy(mult);
+        let proxyPlus = proxy(plus);
+        console.log('5*4=',proxyMult(5,4));
+        console.log('5+4=',proxyPlus(5,4));
+    </script>
+</body>
+
+</html>
