@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let each = function (obj, callback) {
+
+            if (~(typeof obj).indexOf('number', 'string', 'boolean')) {
+                //~-1 = 0 其他数都为真
+                return;
+            }
+            if (Array.isArray(obj)) {
+                for (let i = 0, item; item = obj[i++];) {
+                    if (callback.call(item, i, item, obj) === false) {
+                        break;
+                    }
+                }
+            } else {
+                for (key in obj) {
+                    if (callback.call(obj[key], key, obj[key], obj) === false) {
+                        break;
+                    }
+                }
+            }
+
+
+        }
+
+        let arr = {
+            age: "1",
+            fff: "ddd"
+        };
+
+        each(arr, function (index, item, arr) {
+            console.log(item);
+
+        })
+    </script>
+</body>
+
+</html>

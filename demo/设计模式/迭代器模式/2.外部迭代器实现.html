@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let Iterator = function (obj) {
+            if (~(typeof obj).indexOf('number', 'string', 'boolean')) {
+                //~-1 = 0 其他数都为真
+                return;
+            }
+            let current = 0;
+            let key = 0;
+            let keys = [];
+            let next = null;
+            if (Array.isArray(obj)) {
+                keys = obj;
+                next = function () {
+                    key = ++current;
+                }
+            } else {
+                keys = Object.keys(obj)
+                key = keys[0];
+                next = function () {
+                    key = keys[++current];
+                }
+            }
+            let isDone = function () {
+                return current >= keys.length;
+            }
+            let getItem = function () {
+                return obj[key];
+            }
+            return {
+                next,
+                isDone,
+                getItem,
+                length: keys.length
+            }
+        }
+        let arr = { age: "$44", bb: "dd555", dd: "777" };
+        let iterator1 = Iterator(arr);
+        console.log(iterator1.getItem());
+        iterator1.next();
+        console.log(iterator1.getItem());
+        iterator1.next();
+        console.log(iterator1.getItem());
+    </script>
+</body>
+
+</html>
