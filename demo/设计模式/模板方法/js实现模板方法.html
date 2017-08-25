@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let Beverage = function (param) {
+            let boilWater = function () {
+                //做什么饮料都需要煮水,子类可以不实现
+                console.log("烧水")
+            }
+            let brew = param.brew || function () {
+                throw new Error('brew方法未重写');
+            }
+            let pourInCup = param.pourInCup || function () {
+                throw new Error('pourInCup方法未重写');
+            }
+            let addCondiments = param.addCondiments || function () {
+                throw new Error('addCondiments方法未重写');
+            }
+            let customerWantsCondiments = param.customerWantsCondiments || function () {
+                //默认加调料
+                return true;
+            }
+
+            let F = function () { };
+            F.prototype.init = function () {
+                boilWater();
+                brew();
+                pourInCup();
+                if (customerWantsCondiments()) {
+                    addCondiments();
+                }
+            }
+            return F;
+        };
+
+        let CokesBeverages = Beverage({
+            boilWater: function () {
+                console.log("烧水");
+            },
+            brew: function () {
+                console.log("冲泡");
+            },
+            pourInCup: function () {
+                console.log("倒进杯子");
+            },
+            addCondiments: function () {
+                console.log("加调料");
+            }
+        })
+
+        // 制作一杯可乐
+        let cokes = new CokesBeverages();
+        cokes.init();
+    </script>
+</body>
+
+</html>

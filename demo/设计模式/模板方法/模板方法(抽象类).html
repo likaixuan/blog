@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //抽象类
+        let Beverage = function () { };
+
+        Beverage.prototype.boilWater = function () {
+            //做什么饮料都需要煮水,子类可以不实现
+            console.log("烧水")
+        }
+
+        Beverage.prototype.brew = function () {
+            throw new Error('brew方法未重写');
+        }
+
+        Beverage.prototype.pourInCup = function () {
+            throw new Error('pourInCup方法未重写');
+        }
+
+        Beverage.prototype.addCondiments = function () {
+            throw new Error('addCondiments方法未重写');
+        }
+
+        Beverage.prototype.customerWantsCondiments = function () {
+            //默认加调料
+            return true;
+        }
+
+        Beverage.prototype.init = function () {
+            this.boilWater();
+            this.brew();
+            this.pourInCup();
+            if (this.customerWantsCondiments()) {
+                this.addCondiments();
+            }
+
+        }
+
+
+        //创建可乐类 并继承 饮料类
+
+        let CokesBeverages = function () { };
+
+        CokesBeverages.prototype = new Beverage();
+
+        CokesBeverages.prototype.boilWater = function () {
+            console.log("烧水");
+        }
+
+        CokesBeverages.prototype.brew = function () {
+            console.log("冲泡");
+        }
+
+        CokesBeverages.prototype.pourInCup = function () {
+            console.log("倒进杯子");
+        }
+
+        CokesBeverages.prototype.addCondiments = function () {
+            console.log("加调料");
+        }
+
+        // 制作一杯可乐
+        let cokes = new CokesBeverages();
+        cokes.init();
+    </script>
+</body>
+
+</html>
