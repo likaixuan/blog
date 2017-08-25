@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let Event = {
+            _clientList: {},
+            $emit: function () {
+                let key = Array.prototype.shift.call(arguments);
+                let funs = this._clientList[key];
+                if (!funs && funs.length === 0) {
+                    return false;
+                }
+                for (let i = 0, item; item = funs[i++];) {
+                    item.apply(this, arguments);
+                }
+            },
+            $on: function (key, fn) {
+                if (!this._clientList[key]) {
+                    this._clientList[key] = [];
+                }
+                this._clientList[key].push(fn);
+
+            },
+            $off: function (key, fn) {
+                let arr = this._clientList[key];
+                if (!arr) {
+                    return false;
+                }
+                //移除全部
+                if (!fn) {
+                    arr.length = 0;
+                    return;
+                }
+                for (let i = 0, item; item = arr[i++];) {
+                    if (fn === item) {
+                        arr.splice(i - 1, 1);
+                        break;
+                    }
+                }
+            }
+        }
+        Event.$on('login', function () {
+            console.log("登陆+1");
+        })
+        Event.$emit("login");
+        let fun2 = function () {
+            console.log("登陆+2");
+        }
+        Event.$on('login', fun2)
+        Event.$off('login', fun2);
+        Event.$emit("login");
+    </script>
+</body>
+
+</html>
