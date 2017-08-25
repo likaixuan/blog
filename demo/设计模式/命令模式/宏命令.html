@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //其实就是调用一次 执行一组命令 
+
+
+        //命令对象
+        let command1 = {
+            execute: function () {
+                console.log('1');
+            }
+        };
+        let command2 = {
+            execute: function () {
+                console.log('2');
+            }
+        };
+        let command3 = {
+            execute: function () {
+                console.log('3');
+            }
+        };
+
+        // 宏命令对象
+        let macroCommand = (function () {
+
+            return {
+                commandList: [],
+                add: function (command) {
+                    this.commandList.push(command);
+                },
+                execute: function () {
+                    for (let i = 0, item; item = this.commandList[i++];) {
+                        item.execute();
+                    }
+                }
+            }
+        })();
+        
+        macroCommand.add(command1);
+        macroCommand.add(command2);
+        macroCommand.add(command3);
+        macroCommand.execute();
+        
+    </script>
+</body>
+
+</html>

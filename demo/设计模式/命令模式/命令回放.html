@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0px;
+        }
+        #cubes {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            line-height: 100px;
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="replay">
+        撤销
+    </button>
+    <div id="cubes">
+        小乖乖
+    </div>
+    <script>
+        //使用动作
+        let makeCommand = function (receiver, state) {
+            return function () {
+                receiver[state]();
+            }
+        }
+
+        //动作
+        let action = (
+            function (el) {
+                let _elWidth = el.offsetWidth;
+                let _elHeight = el.offsetHeight;
+                let top = function () {
+                    console.log(4)
+                    el.style.top = el.offsetTop - _elHeight + 'px';
+                };
+                let bottom = function () {
+                    el.style.top = el.offsetTop + _elHeight + 'px';
+                };
+                let left = function () {
+                    el.style.left = el.offsetLeft - _elWidth + 'px';
+                };
+                let right = function () {
+                    el.style.left = el.offsetLeft + _elWidth + 'px';
+                };
+                let setColor = function (color) {
+
+                };
+                return {
+                    el,
+                    top,
+                    bottom,
+                    left,
+                    right,
+                    setColor
+                }
+            }
+        )(document.querySelector('#cubes'));
+
+        //命令
+        let commands = {
+            '119': "top",    // W
+            '115': "bottom", // S
+            '97': "left",    // A
+            '100': "right",  // D
+            '32': "setColor" // space
+        }
+
+        let commandStack = [];
+
+        document.onkeypress = function (e) {
+            let command = makeCommand(action,commands[e.keyCode])
+            if(command) {
+                command();
+                commandStack.push(command);
+            }
+        }
+
+        document.querySelector('#replay').onclick = function () {
+            let timerId = setInterval(function(){
+                let index = commandStack.length-1;
+                if(index<0) {
+                    clearInterval(timerId);
+                    return;
+                }
+                commandStack[index]();
+                commandStack.splice(index,1);
+              
+            },2000)
+        }
+        
+    </script>
+</body>
+
+</html>
