@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let Upload = function (uploadType, fileName, fileSize) {
+            this.uploadType = uploadType;
+            this.fileName = fileName;
+            this.fileSize = fileSize;
+            this.dom = null;
+        }
+
+
+        Upload.prototype.init = function (id) {
+            this.id = id;
+            this.dom = document.createElement('div');
+            this.dom.innerHTML = `<span>文件名称:${this.fileName},文件大小:${this.fileSize}</span><button class='delFile'>删除</button>`;
+            this.dom.querySelector('.delFile').onclick = () => {
+                this.delFile();
+            }
+            document.body.appendChild(this.dom);
+        }
+
+        Upload.prototype.delFile = function () {
+            if (this.fileSize < 3000) {
+                return this.dom.parentNode.removeChild(this.dom);
+            } else if (confirm(`确定要删除${this.fileName}吗?`)) {
+                return this.dom.parentNode.removeChild(this.dom);
+            }
+
+        }
+        let id = 0;
+        let startUpload = function (uploadType, files) {
+            for (let i = 0, item; item = files[i++];) {
+                let uploadObj = new Upload(uploadType, item.fileName, item.fileSize);
+                uploadObj.init(id++);
+            }
+        }
+        startUpload('h5', [{
+            fileName: "111.txt",
+            fileSize: 1000
+        }, {
+            fileName: "111.txt",
+            fileSize: 4000
+        }])
+    </script>
+</body>
+
+</html>

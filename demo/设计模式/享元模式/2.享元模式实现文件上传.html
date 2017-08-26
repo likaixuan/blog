@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // 思路:上传有很多种形式 比如有flash 、表单、插件等等，每一种形式的 deLFile等方法都不同 我们需要一个工厂函数帮我们根据不同类型 创建不同的 长传插件对象 他们身上都有不同的delFile实现
+        let Upload = function (uploadType) {
+            this.uploadType = uploadType;
+        }
+        let uploadManager = (function () {
+            let uploadDatabase = {};
+            return {
+                add: function (id, uploadType, fileName, fileSize) {
+                    let flyWeightObj = UploadFactory.create(uploadType);
+
+                    let dom = document.createElement('div');
+                    dom.innerHTML = `<span>文件名称:${fileName},文件大小:${fileSize}</span><button class='delFile'>删除</button>`;
+                    dom.querySelector('.delFile').onclick = () => {
+                        flyWeightObj.delFile(id);
+                    }
+                    document.body.appendChild(dom);
+
+                    uploadDatabase[id] = {
+                        fileName: fileName,
+                        fileSize: fileSize,
+                        dom: dom
+                    }
+                    return flyWeightObj;
+                },
+                setExternalState: function (id, flyWeightObj) {
+                    let uploadData = uploadDatabase[id];
+                    for (let i in uploadData) {
+                        flyWeightObj[i] = uploadData[i];
+                    }
+                    console.log(arguments);
+                }
+            }
+        })();
+        Upload.prototype.delFile = function (id) {
+            uploadManager.setExternalState(id, this);
+            if (this.fileSize < 3000) {
+                return this.dom.parentNode.removeChild(this.dom);
+            } else if (confirm(`确定要删除${this.fileName}吗?`)) {
+                return this.dom.parentNode.removeChild(this.dom);
+            }
+
+        }
+        // 工厂
+        let UploadFactory = (function () {
+            let createdFlyWeightObjs = {};
+            return {
+                create: function (uploadType) {
+                    if (createdFlyWeightObjs[uploadType]) {
+                        return createdFlyWeightObjs[uploadType];
+                    }
+                    return createdFlyWeightObjs[uploadType] = new Upload(uploadType);
+                }
+            }
+        })();
+
+
+
+        
+        let id = 0;
+        let startUpload = function (uploadType, files) {
+            for (let i = 0, item; item = files[i++];) {
+                let uploadObj = uploadManager.add(id++, uploadType, item.fileName, item.fileSize);
+            }
+        }
+        startUpload('h5', [{
+            fileName: "111.txt",
+            fileSize: 1000
+        }, {
+            fileName: "111.txt",
+            fileSize: 4000
+        }])
+    </script>
+</body>
+
+</html>
