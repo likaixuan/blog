@@ -11,6 +11,7 @@
 <body>
     <script>
         // 思路:上传有很多种形式 比如有flash 、表单、插件等等，每一种形式的 deLFile等方法都不同 我们需要一个工厂函数帮我们根据不同类型 创建不同的 长传插件对象 他们身上都有不同的delFile实现
+        // 这个不同类型 就是我们的内部状态  类似于 fileName这种的就是外部状态  我们在delFile的时候需要用到外部状态 所以需要将外部状态传入 对象中与 内部状态 组合成一个完整对象
         let Upload = function (uploadType) {
             this.uploadType = uploadType;
         }
