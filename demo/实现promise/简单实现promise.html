@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function Promise() {
+            this.callbacks = [];
+            this.oncatch = null;
+        }
+        Promise.prototype.then = function (onsuccess, onfail) {
+            this.callbacks.push({
+                resolve: onsuccess,
+                reject: onfail
+            })
+            return this
+        }
+        Promise.prototype.resolve = function (result) {
+            this.complete('resolve', result);
+        }
+        Promise.prototype.reject = function (result) {
+            this.complete('reject', result);
+        }
+        Promise.prototype.complete = function (type, result) {
+            if (type === 'reject' && this.catch) {
+                this.callbacks = []
+                this.oncatch(result)
+            } else if (this.callbacks[0]) {
+                let handlerObj = this.callbacks.shift()
+                if (handlerObj[type]) {
+                    handlerObj[type](result)
+                }
+            }
+        }
+        Promise.prototype.catch = function (onfail) {
+            this.oncatch = onfail;
+            return this;
+        }
+        var promise = new Promise();
+        promise.then(function () {
+            console.log(promise.callbacks)
+            let n = Math.random();
+            console.log(n);
+            if (n > 0.5) {
+                promise.resolve('等待三秒见证奇迹吧')
+            } else {
+                promise.reject('失败了')
+            }
+        }).then(function (result) {
+            console.log(result);
+            setTimeout(function () {
+                if (Math.random() > 0.5) {
+                    promise.resolve('奇迹出现了')
+                } else {
+                    promise.reject('最终还是失败了')
+                }
+            }, 3000)
+        }).then(function (result) {
+            console.log(result);
+        }).catch(function () {
+            console.log("失败")
+        }).resolve(4);
+    </script>
+</body>
+
+</html>
