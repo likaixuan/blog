@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let Chain = function (fn) {
+            if (!(this instanceof Chain)) {
+                return new Chain(fn);
+            }
+            this.fn = fn;
+            this.successor = null;
+        };
+
+        Chain.prototype.setNext = function (successor) {
+            return this.successor = successor;
+        }
+        Chain.prototype.run = function () {
+            //第一次传参时
+            if (!Chain.args) {
+                Chain.args = Array.prototype.slice.call(arguments);
+            }
+            let arr = Array.prototype.concat.call(Chain.args,this.next.bind(this));
+            console.log(arr);
+            return this.fn.apply(this,arr);
+        }
+        Chain.prototype.next = function () {
+            return this.successor && this.successor.run.apply(this.successor, arguments);
+        }
+        let order500 = function (orderType, pay, stock, next) {
+            // console.log(next,555);
+            if (orderType === 1 && pay === true) {
+                console.log("交过五百定金");
+            } else {
+                console.log(222);
+                setTimeout(next,3000);
+
+            }
+        }
+        let order200 = function (orderType, pay, stock, next) {
+            if (orderType === 2 && pay === true) {
+                console.log("交过二百定金");
+            } else {
+                next();
+            }
+        }
+        let orderNormal = function (orderType, pay,stock) {
+            if (stock > 0) {
+                console.log("没交过定金");
+            } else {
+                console.log('手机库存不足');
+            }
+        }
+        var a500 = Chain(order500),
+            a200 = Chain(order200),
+            aNormal = Chain(orderNormal);
+        a500.setNext(a200).setNext(aNormal);
+        a500.run(3, true, 500);
+    </script>
+</body>
+
+</html>
