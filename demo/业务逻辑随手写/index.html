@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>Document</title>
+		<style type="text/css">
+			body {
+				margin: 0;
+			}
+			
+			#map {
+				width: 600px;
+				height: 600px;
+				background: black;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="map">
+
+		</div>
+	</body>
+	<script type="text/javascript">
+		//公共方法库
+		let utils = (function() {
+			let obj = {}
+				//类型检测
+			;
+			(function(arr) {
+				let type = "";
+				for(let i = 0, type; type = arr[i++];) {
+					obj['is' + type] = function(val) {
+						return Object.prototype.toString.call(val) === '[object ' + type + ']'
+					}
+				}
+
+			})(['String', 'Array', 'Number', 'Object', 'Function', 'Null', 'Undefined'])
+
+			obj.eventBus = {
+				list: {},
+				cached: {},
+				on: function(type, fun) {
+					//绑定事件与回调
+					if(!fun) {
+						return
+					}
+					if(!this.list[type]) {
+						this.list[type] = [];
+					}
+					//将重复过滤
+					this.off(type, fun)
+					this.list[type].push(fun)
+
+					let args = this.cached[type]
+					if(args && Array.isArray(args)) {
+						fun.apply(null, args)
+					}
+
+				},
+				off: function(type, fun) {
+					//解除绑定
+
+					var funArr = this.list[type];
+
+					if(!funArr) {
+						return false;
+					}
+					if(!fun) {
+						this.cached[type] = null;
+						this.list[type] = [];
+					} else {
+						for(var i = 0; i < funArr.length; i++) {
+							if(fun === funArr[i]) {
+								funArr.splice(i, 1);
+							}
+						}
+					}
+				},
+				emit: function(type) {
+					//触发事件回调
+					var args = Array.prototype.slice.call(arguments, 1);
+					this.cached[type] = args
+					var funArr = this.list[type];
+					if(!funArr) {
+						return false;
+					}
+					for(var i = 0; i < funArr.length; i++) {
+						funArr[i].apply(this, args);
+					}
+
+				}
+
+			}
+			return obj
+		})()
+
+		//蛇对象
+		let snake = (function() {
+
+			let timerId
+
+			//蛇的操作
+			let __SnakeAction = {
+				goUp: function() {
+					console.log(11111)
+				},
+				goDown: function() {
+
+				},
+				goLeft: function() {
+
+				},
+				goRight: function() {
+
+				}
+			}
+
+			//执行操作
+			let executeAction = function(activeNmae) {
+				if(!activeNmae) {
+					return
+				}
+				let action = __SnakeAction[activeNmae]
+				let args = Array.prototype.slice.call(arguments, 1)
+
+				if(action && utils.isFunction(action)) {
+					let defaultArgs = []
+					action.apply(null, defaultArgs.concat(args))
+				}
+			}
+
+			//按键对应的操作
+			let __keyCommand = {
+				'119': 'goUp',
+				'115': 'goDown',
+				'97': 'goLeft',
+				'100': 'goRight'
+			}
+
+			let __initSnakeBody = function() {
+				//初始化蛇身
+			}
+			let __initMap = function() {
+				//初始化地图
+			}
+			let __bindEvents = function() {
+				//绑定事件
+
+				document.onkeypress = function(e) {
+					let keyCode = e.keyCode
+					console.log(keyCode)
+					utils.eventBus.emit('onkeypress')
+					executeAction(__keyCommand[keyCode], 1, 2)
+				}
+			}
+			
+			return {
+				init: function() {
+					__initMap()
+					__initSnakeBody()
+					__bindEvents()
+				},
+				destroy: function() {
+
+				},
+				pause: function() {
+
+				},
+				start: function() {
+
+				}
+			}
+		})()
+		
+		
+		//开始
+		snake.init()		
+		utils.eventBus.on('onkeypress',function () {
+			console.log('键盘按下了')
+		})
+	</script>
+
+</html>
