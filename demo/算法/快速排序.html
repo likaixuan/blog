@@ -4,29 +4,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
 </head>
 
 <body>
   <script>
-    let quickSort = function (arr) {
-      if (arr.length < 1) {
-        return arr;
+
+    function quickSort({ data, startIndex = 0, endIndex = data.length - 1 }) {
+      if (startIndex >= endIndex) {
+        return
       }
-      let leftArr = [];
-      let rightArr = [];
-      let currentEl = arr.splice(0, 1)[0];
-      for (let i = 0, item; item = arr[i++];) {
-        if (item < currentEl) {
-          leftArr.push(item);
-        } else {
-          rightArr.push(item);
+      // p为初始哨兵值，j为当前分区最终哨兵索引值
+      const p = data[endIndex]
+      let j = startIndex
+      for (let i = startIndex; i < endIndex; i++) {
+        if (p > data[i]) {
+          let t = data[i]
+          data[i] = data[j]
+          data[j] = t
+          j++
         }
       }
-      return quickSort(leftArr).concat([currentEl], quickSort(rightArr));
+      let t = data[endIndex]
+      data[endIndex] = data[j]
+      data[j] = t
+
+      quickSort({
+        data,
+        startIndex: j + 1,
+        endIndex
+      })
+      quickSort({
+        data,
+        startIndex,
+        endIndex: j - 1
+      })
     }
-    console.log(quickSort([5, 7, 6, 2, 1, 7, 9]))
+    let data = [3, 2, 1, 0, 3, 5, 1, 223, 122, 455, 111, 0, 44, 11, 444, 777, 99]
+    quickSort({
+      data
+    })
+    console.log(data)
   </script>
 </body>
 
